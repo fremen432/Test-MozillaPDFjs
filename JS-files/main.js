@@ -1,15 +1,12 @@
 #!/usr/bin/env node
 
-import { transformReport } from "./extract-peak-counts.js";
-import { addLeadingZeros, readPDF, makeDir } from "./helperFunctions.js";
-// import { PATTERNS } from "./extract-peak-counts.js";
 import {
-    PATTERNS,
-    NORTH_SOUTH,
-    SOUTH_NORTH,
-    EAST_WEST,
-    WEST_EAST,
-} from "./constants.js";
+    transformReport,
+    addLeadingZeros,
+    readPDF,
+    makeDir,
+} from "./helperFunctions.js";
+// import { PATTERNS } from "./extract-peak-counts.js";
 
 const PDF_1_PAGE = "./PDFs/US90_Tube-Counts_1page.pdf";
 const PDF_2_PAGE = "./PDFs/US90_Tube-Counts_2page.pdf";

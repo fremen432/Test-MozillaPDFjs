@@ -18,4 +18,6 @@ export const PATTERNS = {
     getLocation: /.+(?=\nLocation)/g,
     getDate: /./g,
     getProjNo: /(?<=Project No. :).+/g,
+    getDayNum: /(?<=%\n).+/g,
+    getDate: /(?<=Vehicles per Hour\n).+/g,
 };
