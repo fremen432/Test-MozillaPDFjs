@@ -139,6 +139,8 @@ export function transformReport(report) {
             };
         });
 
+    return splitTimeAndValues(Peaks);
+    return Peaks.slice(0, 4);
     const AM_peaks = splitTimeAndValues(Peaks.slice(0, 4));
     const PM_peaks = splitTimeAndValues(Peaks.slice(-4));
 
