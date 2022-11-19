@@ -1,3 +1,5 @@
+import fs from "fs";
+
 // async function run(PDF_PATH) {
 //     try {
 //         return await readPdfText(PDF_PATH);
@@ -23,3 +25,18 @@
 //             });
 //         });
 // }
+
+function doesFileExist(path) {
+    return fs.existsSync(path);
+}
+
+function textToReports(text, pattern) {
+    // separated 1 text file into array of 'reports' (2-day traffic volume data reports)
+    return text.match(PATTERNS.wholeDoc);
+}
+
+function readFile(path) {
+    return fs.readFileSync(path, "utf-8", (err, data) =>
+        data.catch((err) => console.log(err))
+    );
+}
