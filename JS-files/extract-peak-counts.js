@@ -1,15 +1,6 @@
 // var fs = require("fs");
 import fs from "fs";
 
-const PATH_FROM_01 = "./TXT-files/pdf-to-text.txt";
-const PATH_FROM_02 = "./TXT-files/pdf-to-text02.txt";
-
-const PATH_FROM_03 = "../TXT-files/pdf-to-text.txt";
-const PATH_FROM_04 = "../TXT-files/pdf-to-text02.txt";
-
-const PDF_1_PAGE = "./PDF-files/US90_Tube-Counts_1page.pdf";
-const PDF_FULL = "./PDF-files/US90_Tube-Counts_FULL.pdf";
-
 import {
     PATTERNS,
     NORTH_SOUTH,
@@ -57,30 +48,33 @@ if section
 
 */
 
-const doesFileExist = (path) => fs.existsSync(path);
+function doesFileExist(path) {
+    return fs.existsSync(path);
+}
 
-const textToReports = (text, pattern) => text.match(PATTERNS.wholeDoc);
-// separated 1 text file into array of 'reports' (2-day traffic volume data reports)
+function textToReports(text, pattern) {
+    // separated 1 text file into array of 'reports' (2-day traffic volume data reports)
+    return text.match(PATTERNS.wholeDoc);
+}
 
-const readFile = (path) =>
-    fs.readFileSync(path, "utf-8", (err, data) =>
+function readFile(path) {
+    return fs.readFileSync(path, "utf-8", (err, data) =>
         data.catch((err) => console.log(err))
     );
+}
 
-const removeCommas = (txt) => txt.replaceAll(",", "");
-// remove commas from numbers. also helps with CSV format
+function removeCommas(txt) {
+    // remove commas from numbers. also helps with CSV format
+    return txt.replaceAll(",", "");
+}
 
-const fixTime = (txt) =>
+function fixTime(txt) {
     // add "0" before all 1:00 type times
     // then separate each time on it's own line
-    txt
+    return txt
         .replaceAll(PATTERNS.addLeadingZero, "\n0")
         .replaceAll(PATTERNS.timeReturn, "\n");
-
-const getPeaks = (text) => text.match(PATTERNS.getPeaks).sort();
-const getCounter = (txt) => txt.match(PATTERNS.getCounter).toString();
-const getLocation = (txt) => txt.match(PATTERNS.getLocation).toString();
-const getProjNo = (txt) => txt.match(PATTERNS.getProjNo).toString();
+}
 
 function getDirection(report) {
     // return report;
@@ -110,21 +104,22 @@ export function transformReport(report) {
     report = removeCommas(report);
     report = fixTime(report);
 
-    const Project_No = getProjNo(report);
-    const Counter_No = getCounter(report);
-    const Location = getLocation(report);
     const Direction = getDirection(report);
-    const peaks = getPeaks(report);
+
+    const Peaks = report.match(PATTERNS.getPeaks).sort();
+    const Counter_No = report.match(PATTERNS.getCounter).toString();
+    const Location = report.match(PATTERNS.getLocation).toString();
+    const Project_No = report.match(PATTERNS.getProjNo).toString();
 
     // return ProjNo;
 
-    let splitTimeAndValues = (thesePeaks) =>
+    const splitTimeAndValues = (thesePeaks) =>
         thesePeaks.map((el) => {
-            let splitted = el.split(" * ");
-            let Time = splitted[0];
+            const splitted = el.split(" * ");
+            const Time = splitted[0];
             let Values = splitted[1].split(" ");
-            // if the time values have 4 values, only return the 1st and 3rd value
             if (Values.length == 4) {
+                // if the time values have 4 values, only return the 1st and 3rd value
                 Values = [Number(Values[0]), Number(Values[2])];
             } else {
                 Values = [Number(Values[0]), Number(Values[1])];
@@ -140,12 +135,8 @@ export function transformReport(report) {
             };
         });
 
-    let AM_peaks = splitTimeAndValues(peaks.slice(0, 4));
-    let PM_peaks = splitTimeAndValues(peaks.slice(-4));
+    const AM_peaks = splitTimeAndValues(Peaks.slice(0, 4));
+    const PM_peaks = splitTimeAndValues(Peaks.slice(-4));
 
     return { AM_peaks, PM_peaks };
-}
-
-export function printHi() {
-    return console.log("hi");
 }
