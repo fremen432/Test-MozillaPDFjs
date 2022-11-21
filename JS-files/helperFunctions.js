@@ -53,7 +53,6 @@ export async function readPDF(PDF_PATH) {
 }
 
 export function JSON_to_CSV(myJSON, path) {
-    // return JSON.stringify(myJSON);
     const fullString = [];
     for (let obj of myJSON) {
         const arr = [
@@ -69,13 +68,8 @@ export function JSON_to_CSV(myJSON, path) {
             obj.Value_02,
         ];
         fullString.push(arr.join(CSV_separator));
-        // fullString.concat(JSON.stringify(obj), "\n");
     }
     return fs.appendFileSync(CSV_filePath, "\n".concat(fullString.join("\n")));
-    // return fullString;
-    return CSV_firstLine.length;
-
-    // return myJSON;
 }
 
 export async function makeDir(path) {
@@ -128,72 +122,79 @@ export function getDirection(report) {
 export function transformReport(report) {
     // transforms raw text into an object { Direction, Time, Values }
 
-    // return report;
     report = removeCommas(report);
     report = fixTime(report);
 
     const Direction = getDirection(report);
 
-    const matches = {
-        Peaks: report.match(PATTERNS.getPeaks),
-        Counter_No: report.match(PATTERNS.getCounter),
-        Location: report.match(PATTERNS.getLocation),
-        Project_No: report.match(PATTERNS.getProjNo),
-        DayNum: report.match(PATTERNS.getDayNum),
-        Date: report.match(PATTERNS.getDate),
-    };
+    // const matches = {
+    //     Peaks: report.match(PATTERNS.getPeaks),
+    //     Counter_No: report.match(PATTERNS.getCounter),
+    //     Location: report.match(PATTERNS.getLocation),
+    //     Project_No: report.match(PATTERNS.getProjNo),
+    //     DayNum: report.match(PATTERNS.getDayNum),
+    //     Date: report.match(PATTERNS.getDate),
+    // };
 
-    const Peaks = matches.Peaks ? matches.Peaks : "NO MATCH FOUND FOR: 'Peaks'";
-    const Counter_No = matches.Counter_No
-        ? matches.Counter_No
-        : "NO MATCH FOUND FOR: 'Counter_No'";
-    const Location = matches.Location
-        ? matches.Location
-        : "NO MATCH FOUND FOR: 'Location'";
-    const Project_No = matches.Project_No
-        ? matches.Project_No
-        : "NO MATCH FOUND FOR: 'Project_No'";
-    const DayNum = matches.DayNum
-        ? matches.DayNum
-        : "NO MATCH FOUND FOR: 'DayNum'";
-    const Date = matches.Date ? matches.Date : "NO MATCH FOUND FOR: 'Date'";
+    // const Peaks = matches.Peaks ? matches.Peaks : "NO MATCH FOUND FOR: 'Peaks'";
+    // const Counter_No = matches.Counter_No
+    //     ? matches.Counter_No
+    //     : "NO MATCH FOUND FOR: 'Counter_No'";
+    // const Location = matches.Location
+    //     ? matches.Location
+    //     : "NO MATCH FOUND FOR: 'Location'";
+    // const Project_No = matches.Project_No
+    //     ? matches.Project_No
+    //     : "NO MATCH FOUND FOR: 'Project_No'";
+    // const DayNum = matches.DayNum
+    //     ? matches.DayNum
+    //     : "NO MATCH FOUND FOR: 'DayNum'";
+    // const Date = matches.Date ? matches.Date : "NO MATCH FOUND FOR: 'Date'";
 
-    // return report;
-    // return DayNum;
+    const Peaks =
+        report.match(PATTERNS.getPeaks) || "NO MATCH FOUND FOR: 'Peaks'";
+    const Counter_No =
+        report.match(PATTERNS.getCounter) || "NO MATCH FOUND FOR: 'Counter_No'";
+    const Location =
+        report.match(PATTERNS.getLocation) || "NO MATCH FOUND FOR: 'Location'";
+    const Project_No =
+        report.match(PATTERNS.getProjNo) || "NO MATCH FOUND FOR: 'Project_No'";
+    const DayNum =
+        report.match(PATTERNS.getDayNum) || "NO MATCH FOUND FOR: 'DayNum'";
+    const Date = report.match(PATTERNS.getDate) || "NO MATCH FOUND FOR: 'Date'";
 
     const splitTimeAndValues = (thesePeaks) =>
-        thesePeaks
-            ? thesePeaks.map((el) => {
-                  const splitted = el.split(" * ");
-                  const Time = splitted[0];
-                  let Values = splitted[1].split(" ");
-                  if (Values.length == 4) {
-                      // if the time values have 4 values, only return the 1st and 3rd value
-                      Values = [Number(Values[0]), Number(Values[2])];
-                  } else {
-                      Values = [Number(Values[0]), Number(Values[1])];
-                  }
-                  const AM_PM = Time.split(":")[0] < 12 ? "AM" : "PM";
-                  // return { Time, AM_PM };
-                  return {
-                      thisDate: Date,
-                      Day_Number: DayNum,
-                      Project_Number: Project_No,
-                      Counter_Number: Counter_No,
-                      Location: Location,
-                      Direction: Direction,
-                      Time: Time,
-                      AM_PM: AM_PM,
-                      Value_01: Values[0],
-                      Value_02: Values[1],
-                  };
-              })
-            : "No peaks found";
-    // return "hey";
-    // return makeCSV();
-    // return JSONToCSV();
-    // const CSV_format = JSONToCSV(splitTimeAndValues(Peaks));
-    // return CSV_format;
+        thesePeaks.map((el) => {
+            const splitted = el.split(" * ");
+            const Time = splitted[0];
+            let Values = splitted[1].split(" ");
+
+            // if the time values have 4 values, only return the 1st and 3rd value
+            Values =
+                Values.length == 4
+                    ? [Number(Values[0]), Number(Values[2])]
+                    : [Number(Values[0]), Number(Values[1])];
+
+            // if (Values.length == 4) {
+            //     // if the time values have 4 values, only return the 1st and 3rd value
+            //     Values = [Number(Values[0]), Number(Values[2])];
+            // } else {
+            //     Values = [Number(Values[0]), Number(Values[1])];
+            // }
+            const AM_PM = Time.split(":")[0] < 12 ? "AM" : "PM";
+            return {
+                thisDate: Date,
+                Day_Number: DayNum,
+                Project_Number: Project_No,
+                Counter_Number: Counter_No,
+                Location: Location,
+                Direction: Direction,
+                Time: Time,
+                AM_PM: AM_PM,
+                Value_01: Values[0],
+                Value_02: Values[1],
+            };
+        }) || "No peaks found";
     return splitTimeAndValues(Peaks);
     return Peaks.slice(0, 4);
     const AM_peaks = splitTimeAndValues(Peaks.slice(0, 4));
@@ -201,21 +202,3 @@ export function transformReport(report) {
 
     return { AM_peaks, PM_peaks };
 }
-
-// function JSONToCSV(JSON) {
-//     var json = JSON.items;
-//     var fields = Object.keys(json[0]);
-//     var replacer = function (key, value) {
-//         return value === null ? "" : value;
-//     };
-//     var csv = json.map(function (row) {
-//         return fields
-//             .map(function (fieldName) {
-//                 return JSON.stringify(row[fieldName], replacer);
-//             })
-//             .join(",");
-//     });
-//     csv.unshift(fields.join(",")); // add header column
-//     csv = csv.join("\r\n");
-//     console.log(csv);
-// }
