@@ -40,3 +40,11 @@ function readFile(path) {
         data.catch((err) => console.log(err))
     );
 }
+
+// export async function readPDF(PDF_PATH) {
+//     try {
+//         return await readPdfText(PDF_PATH);
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
