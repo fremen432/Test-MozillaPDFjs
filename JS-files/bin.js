@@ -48,3 +48,33 @@ function readFile(path) {
 //         console.log(error);
 //     }
 // }
+
+export async function makeDir(path) {
+    return;
+    if (!fs.existsSync(path)) {
+        return await fs.promises
+            .mkdir(path, { recursive: true })
+            .catch(console.error);
+    } else {
+        return console.log(`A directory already exists at path: ${path}`);
+    }
+}
+
+export function getDirection_OLD(report) {
+    const N_S = report.match(/Northbound Southbound(?=\n)/g);
+    const S_N = report.match(/Southbound Northbound(?=\n)/g);
+    const E_W = report.match(/Eastbound Westbound(?=\n)/g);
+    const W_E = report.match(/Westbound Eastbound(?=\n)/g);
+
+    const thisDirection =
+        N_S != null
+            ? NORTH_SOUTH
+            : S_N != null
+            ? SOUTH_NORTH
+            : E_W != null
+            ? EAST_WEST
+            : W_E != null
+            ? WEST_EAST
+            : "None";
+    return thisDirection;
+}

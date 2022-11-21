@@ -36,12 +36,9 @@ const CSV_firstLine = CSV_Columns.join(CSV_separator);
 const CSV_filePath = `${PATH_TO_CSV}Report_${Date.now()}.csv`;
 
 export function makeCSV() {
-    const exists = fs.existsSync(CSV_filePath);
-    if (exists) {
-        return console.log(`File: ${CSV_filePath} already exists`);
-    }
-
-    fs.writeFileSync(CSV_filePath, CSV_firstLine);
+    fs.existsSync(CSV_filePath)
+        ? console.log(`File: ${CSV_filePath} already exists`)
+        : fs.writeFileSync(CSV_filePath, CSV_firstLine);
 }
 
 export function addLeadingZeros(num, totalLength) {
@@ -55,32 +52,46 @@ export async function readPDF(PDF_PATH) {
 export function JSON_to_CSV(myJSON, path) {
     const fullString = [];
     for (let obj of myJSON) {
-        const arr = [
-            obj.thisDate,
-            obj.Day_Number,
-            obj.Project_Number,
-            obj.Counter_Number,
-            obj.Location,
-            obj.Direction,
-            obj.Time,
-            obj.AM_PM,
-            obj.Value_01,
-            obj.Value_02,
-        ];
-        fullString.push(arr.join(CSV_separator));
+        fullString.push(
+            "".concat(
+                obj.thisDate,
+                CSV_separator,
+                obj.Day_Number,
+                CSV_separator,
+                obj.Project_Number,
+                CSV_separator,
+                obj.Counter_Number,
+                CSV_separator,
+                obj.Location,
+                CSV_separator,
+                obj.Direction,
+                CSV_separator,
+                obj.Time,
+                CSV_separator,
+                obj.AM_PM,
+                CSV_separator,
+                obj.Value_01,
+                CSV_separator,
+                obj.Value_02,
+                CSV_separator
+            )
+        );
+        // const arr = [
+        //     obj.thisDate,
+        //     obj.Day_Number,
+        //     obj.Project_Number,
+        //     obj.Counter_Number,
+        //     obj.Location,
+        //     obj.Direction,
+        //     obj.Time,
+        //     obj.AM_PM,
+        //     obj.Value_01,
+        //     obj.Value_02,
+        // ];
+        // fullString.push(arr.join(CSV_separator));
+        // fullString.push(arr.join(CSV_separator));
     }
     return fs.appendFileSync(CSV_filePath, "\n".concat(fullString.join("\n")));
-}
-
-export async function makeDir(path) {
-    return;
-    if (!fs.existsSync(path)) {
-        return await fs.promises
-            .mkdir(path, { recursive: true })
-            .catch(console.error);
-    } else {
-        return console.log(`A directory already exists at path: ${path}`);
-    }
 }
 
 export function dumpToTXT(content, TXT_PATH) {
@@ -93,30 +104,22 @@ export function removeCommas(txt) {
 }
 
 export function fixTime(txt) {
-    // add "0" before all 1:00 type times
-    // then separate each time on it's own line
-    return txt
-        .replaceAll(PATTERNS.addLeadingZero, "\n0")
-        .replaceAll(PATTERNS.timeReturn, "\n");
+    return (
+        txt
+            // add "0" before all 1:00 type times
+            .replaceAll(PATTERNS.addLeadingZero, "\n0")
+            // then separate each time on it's own line
+            .replaceAll(PATTERNS.timeReturn, "\n")
+    );
 }
 
 export function getDirection(report) {
-    const N_S = report.match(/Northbound Southbound(?=\n)/g);
-    const S_N = report.match(/Southbound Northbound(?=\n)/g);
-    const E_W = report.match(/Eastbound Westbound(?=\n)/g);
-    const W_E = report.match(/Westbound Eastbound(?=\n)/g);
+    const N_S = report.match(/Northbound Southbound(?=\n)/g) && NORTH_SOUTH;
+    const S_N = report.match(/Southbound Northbound(?=\n)/g) && SOUTH_NORTH;
+    const E_W = report.match(/Eastbound Westbound(?=\n)/g) && EAST_WEST;
+    const W_E = report.match(/Westbound Eastbound(?=\n)/g) && WEST_EAST;
 
-    const thisDirection =
-        N_S != null
-            ? NORTH_SOUTH
-            : S_N != null
-            ? SOUTH_NORTH
-            : E_W != null
-            ? EAST_WEST
-            : W_E != null
-            ? WEST_EAST
-            : "None";
-    return thisDirection;
+    return N_S || S_N || E_W || W_E || "None";
 }
 
 export function transformReport(report) {
@@ -201,4 +204,15 @@ export function transformReport(report) {
     const PM_peaks = splitTimeAndValues(Peaks.slice(-4));
 
     return { AM_peaks, PM_peaks };
+}
+
+export async function makeDir(path) {
+    return;
+    if (!fs.existsSync(path)) {
+        return await fs.promises
+            .mkdir(path, { recursive: true })
+            .catch(console.error);
+    } else {
+        return console.log(`A directory already exists at path: ${path}`);
+    }
 }
